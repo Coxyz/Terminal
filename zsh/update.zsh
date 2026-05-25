@@ -33,7 +33,7 @@ zsh-update() {
   if curl -fsSL "$TERMINAL_INSTALL_URL" | TERMINAL_FROM_UPDATER=1 bash; then
     rm -f "$_term_flag_file"
     print -P "%F{green}[terminal]%f Mise à jour terminée — rechargement du shell..."
-    exec zsh
+    source ~/.zshrc
   else
     print -P "%F{red}[terminal]%f Échec de la mise à jour."
     return 1
