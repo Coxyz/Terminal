@@ -91,7 +91,14 @@ _term_prompt_update() {
   fi
 }
 
-# Le check (synchrone) peut poser le flag dès maintenant ; le prompt le détecte
-# immédiatement dans CE shell.
-_term_check_remote
-_term_prompt_update
+# ── Point d'entrée ────────────────────────────────────────────────────────────
+# Ce fichier ne fait que DÉFINIR des fonctions : il NE lance PAS le check au source.
+# Raison : oh-my-zsh auto-source tous les $ZSH_CUSTOM/*.zsh (dont ce fichier) AVANT
+# que .zshrc ne charge export.zsh, puis .zshrc le re-source. Lancer le check ici
+# le ferait tourner deux fois (double prompt) et en ignorant les réglages
+# TERMINAL_* de export.zsh. C'est donc .zshrc qui appelle _term_update_check, une
+# seule fois, une fois export.zsh chargé.
+_term_update_check() {
+  _term_check_remote      # synchrone : peut poser le flag immédiatement…
+  _term_prompt_update     # …que le prompt détecte aussitôt dans CE shell.
+}
