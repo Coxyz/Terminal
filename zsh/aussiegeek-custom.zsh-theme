@@ -32,6 +32,9 @@ case "${USER}" in
   atresall)
     USER_COLOR="cyan"
     ;;
+  root)
+    USER_COLOR="white"
+    ;;
 esac
 
 python_venv_prompt_info() {
