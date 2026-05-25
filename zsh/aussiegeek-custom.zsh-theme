@@ -2,7 +2,7 @@ HOST_VALUE="${HOSTNAME:-${HOST:-}}"
 HOST_SHORT="${HOST_VALUE%%.*}"
 HOST_COLOR="red"
 case "${HOST_SHORT}" in
-  Coxyz)
+  Boxyz)
     HOST_COLOR="yellow"
     ;;
   Aixyz)
@@ -28,6 +28,9 @@ case "${USER}" in
     ;;
   minecraft)
     USER_COLOR="green"
+    ;;
+  atresall)
+    USER_COLOR="cyan"
     ;;
 esac
 
