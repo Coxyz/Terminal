@@ -288,13 +288,6 @@ echo -e "${GREEN}═════════════════════
 # (TERMINAL_NO_AUTO_EXEC=1 pour désactiver ce comportement)
 if [ "${TERMINAL_NO_AUTO_EXEC:-0}" != "1" ] && command -v zsh >/dev/null 2>&1; then
   unset TERMINAL_DISABLE_AUTO_UPDATE TERMINAL_FROM_UPDATER   # ne pas fuiter dans le nouveau shell
-  echo -e "  ${BLUE}Rechargement du shell (exec zsh)...${NC}"
-  if [ -t 0 ]; then
-    exec zsh
-  elif [ -r /dev/tty ]; then
-    # Cas `curl | bash` : stdin est le pipe, on rebranche le terminal.
-    exec zsh </dev/tty
-  fi
+  echo -e "  ${BLUE}Rechargement du shell...${NC}"
+  source ~/.zshrc
 fi
-
-echo -e "  Lance : ${YELLOW}reload${NC} ou ${YELLOW}exec zsh${NC}"
