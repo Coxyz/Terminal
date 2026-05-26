@@ -66,10 +66,8 @@ unset _zsh_file
 [[ -f "$ZSH_CUSTOM/export.zsh" ]] && source "$ZSH_CUSTOM/export.zsh"
 
 # ── Auto-update (après export.zsh pour respecter les réglages TERMINAL_*) ─────
-echo "test"
 [[ -f "$ZSH_CUSTOM/update.zsh" ]] && source "$ZSH_CUSTOM/update.zsh"
 typeset -f _term_update_check >/dev/null && _term_update_check
-echo "test"
 
 # ── Customs ───────────────────────────────────────────────────────────────────
 export VIRTUAL_ENV_DISABLE_PROMPT=1
