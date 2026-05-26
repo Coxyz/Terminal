@@ -63,8 +63,6 @@ _term_check_remote() {
     "https://api.github.com/repos/$TERMINAL_REPO/commits/main" 2>/dev/null)" || return 0
   [[ -n "$remote" ]] || return 0
 
-  echo $installed
-
   installed=""
   [[ -f "$_term_version_file" ]] && installed="$(<"$_term_version_file")"
   if [[ -n "$installed" && "$remote" != "$installed" ]]; then
