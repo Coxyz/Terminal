@@ -63,6 +63,8 @@ _term_check_remote() {
     "https://api.github.com/repos/$TERMINAL_REPO/commits/main" 2>/dev/null)" || return 0
   [[ -n "$remote" ]] || return 0
 
+  echo $installed
+
   installed=""
   [[ -f "$_term_version_file" ]] && installed="$(<"$_term_version_file")"
   if [[ -n "$installed" && "$remote" != "$installed" ]]; then
@@ -99,6 +101,7 @@ _term_prompt_update() {
 # TERMINAL_* de export.zsh. C'est donc .zshrc qui appelle _term_update_check, une
 # seule fois, une fois export.zsh chargé.
 _term_update_check() {
+  echo "in"
   _term_check_remote      # synchrone : peut poser le flag immédiatement…
   _term_prompt_update     # …que le prompt détecte aussitôt dans CE shell.
 }
