@@ -66,8 +66,11 @@ unset _zsh_file
 [[ -f "$ZSH_CUSTOM/export.zsh" ]] && source "$ZSH_CUSTOM/export.zsh"
 
 # ── Auto-update (après export.zsh pour respecter les réglages TERMINAL_*) ──────
-# update.zsh ne définit que des fonctions (oh-my-zsh l'auto-source déjà via
-# $ZSH_CUSTOM/*.zsh). On déclenche le check ICI, une seule fois, une fois
-# export.zsh chargé — sinon le prompt apparaîtrait deux fois par shell.
 [[ -f "$ZSH_CUSTOM/update.zsh" ]] && source "$ZSH_CUSTOM/update.zsh"
 typeset -f _term_update_check >/dev/null && _term_update_check
+
+# ── Customs ────────────────────────────────────────────────────────────────────
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+# ── Autres ─────────────────────────────────────────────────────────────────────
+
