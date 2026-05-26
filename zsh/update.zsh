@@ -81,8 +81,8 @@ _term_prompt_update() {
 
   local remote answer
   remote="$(<"$_term_flag_file")"
-  print -P "%F{yellow}[terminal]%f Nouvelle version dispo (${remote[1,7]})."
-  print -n -- "          Mettre à jour maintenant ? [y/N] "
+  print -P -n -- "%F{yellow}[terminal]%f Nouvelle version disponible de Coxyz-CLI. Mettre à jour maintenant ? [y/N]"
+#  print -n -- "          Mettre à jour maintenant ? [y/N] "
   if read -q answer </dev/tty; then
     print ""
     zsh-update
