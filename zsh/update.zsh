@@ -15,7 +15,7 @@
 # =============================================================================
 
 : ${TERMINAL_REPO:=Coxyz/Terminal}
-: ${TERMINAL_UPDATE_INTERVAL_DAYS:=1}
+: ${TERMINAL_UPDATE_INTERVAL_DAYS:=0}
 : ${TERMINAL_DISABLE_AUTO_UPDATE:=false}
 : ${TERMINAL_INSTALL_URL:=https://raw.githubusercontent.com/$TERMINAL_REPO/main/install.sh}
 
@@ -99,7 +99,6 @@ _term_prompt_update() {
 # TERMINAL_* de export.zsh. C'est donc .zshrc qui appelle _term_update_check, une
 # seule fois, une fois export.zsh chargé.
 _term_update_check() {
-  echo "in"
   _term_check_remote      # synchrone : peut poser le flag immédiatement…
   _term_prompt_update     # …que le prompt détecte aussitôt dans CE shell.
 }
