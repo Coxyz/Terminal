@@ -8,6 +8,9 @@ case "${HOST_SHORT}" in
   Aixyz)
     HOST_COLOR="cyan"
     ;;
+  MacBook)
+    HOST_COLOR="white"
+    ;;
 esac
 HOST_SEGMENT="%F{$HOST_COLOR}%m"
 
