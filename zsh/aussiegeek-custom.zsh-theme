@@ -25,7 +25,7 @@ else
 fi
 
 USER_COLOR="242"
-case "${USER}" in
+case "$(whoami)" in
   opxyz)
     USER_COLOR="red"
     ;;
