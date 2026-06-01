@@ -31,6 +31,7 @@ fi
 # ── Langue & format horaire ───────────────────────────────────────────────────
 # LC_TIME=C.UTF-8 : format 24h neutre, disponible partout (évite l'AM/PM)
 export LANG=fr_FR.UTF-8
+export LC_ALL=fr_FR.UTF-8
 export LC_TIME=C.UTF-8
 
 # ── Historique ────────────────────────────────────────────────────────────────
