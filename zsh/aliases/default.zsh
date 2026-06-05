@@ -18,8 +18,8 @@ alias e='$EDITOR'
 #   ls → grille courte    l → liste sans cachés    ll → liste avec cachés
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --group-directories-first --no-quotes'
-  alias l='eza -lh  --no-quotes --smart-group --group-directories-first --total-size'
-  alias ll='eza -lah --no-quotes --smart-group --group-directories-first --total-size'
+  alias l='eza -lgh  --no-quotes --smart-group --group-directories-first --total-size'
+  alias ll='eza -lagh --no-quotes --smart-group --group-directories-first --total-size'
   alias la='eza -a   --no-quotes --group-directories-first'
   alias lt='eza --tree --level=2 --no-quotes --group-directories-first'
 else
