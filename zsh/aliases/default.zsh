@@ -21,7 +21,7 @@ if command -v eza >/dev/null 2>&1; then
   alias l='eza -lgh  --no-quotes --group-directories-first'
   alias ll='eza -lagh --no-quotes --group-directories-first'
   alias la='eza -a   --no-quotes --group-directories-first'
-  alias lt='eza --tree --level=2 --no-quotes --group-directories-first'
+  alias lt='eza --tree --level=5 --no-quotes --group-directories-first'
 else
   alias l='ls -lh'
   alias ll='ls -lha'
