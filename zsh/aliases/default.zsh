@@ -27,5 +27,14 @@ else
   alias ll='ls -lha'
 fi
 
+#------ BAT (cat amélioré) ------#
+# bat si disponible (https://github.com/sharkdp/bat), sinon repli sur cat.
+# --paging=never = comportement identique à cat (pas de pager interactif).
+if command -v bat >/dev/null 2>&1; then
+  alias cat='bat --paging=never'
+elif command -v batcat >/dev/null 2>&1; then
+  alias cat='batcat --paging=never'
+fi
+
 #------ UTILITIES ------#
 alias cls='clear'

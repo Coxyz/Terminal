@@ -176,6 +176,61 @@ else
   esac
 fi
 
+# ── bat (cat amélioré) ────────────────────────────────────────────────────────
+install_bat_prebuilt() {
+  local arch target url tmp
+  arch="$(uname -m)"
+  case "$arch" in
+    x86_64|amd64)  target="x86_64-unknown-linux-musl" ;;
+    aarch64|arm64) target="aarch64-unknown-linux-gnu" ;;
+    *) warn "Architecture non gérée pour bat pré-compilé : $arch"; return 1 ;;
+  esac
+  local version
+  version="$(curl -fsSL --max-time 8 "https://api.github.com/repos/sharkdp/bat/releases/latest" 2>/dev/null \
+    | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')" || true
+  [ -z "$version" ] && { warn "Impossible de récupérer la version de bat"; return 1; }
+  url="https://github.com/sharkdp/bat/releases/download/v${version}/bat-v${version}-${target}.tar.gz"
+  mkdir -p "$LOCAL_BIN"
+  tmp="$(mktemp -d)" || return 1
+  if curl -fsSL "$url" -o "$tmp/bat.tar.gz" \
+      && tar -xzf "$tmp/bat.tar.gz" -C "$tmp" --strip-components=1 \
+      && [ -f "$tmp/bat" ]; then
+    mv "$tmp/bat" "$LOCAL_BIN/bat"
+    chmod +x "$LOCAL_BIN/bat"
+    rm -rf "$tmp"
+    return 0
+  fi
+  rm -rf "$tmp"
+  return 1
+}
+
+step "bat (cat amélioré)"
+if command -v bat &>/dev/null || command -v batcat &>/dev/null; then
+  skip "bat déjà installé"
+else
+  case "$PLATFORM" in
+    macos)
+      if command -v brew &>/dev/null; then
+        brew install bat >/dev/null 2>&1 && info "bat installé (brew)" || warn "Échec installation bat via brew"
+      else
+        warn "Homebrew absent — installe bat manuellement : brew install bat"
+      fi
+      ;;
+    linux)
+      if _has_sudo && command -v apt-get &>/dev/null; then
+        sudo apt-get install -y bat >/dev/null 2>&1 && info "bat installé (apt)" || warn "Échec installation bat via apt"
+      else
+        info "Installation de bat (binaire pré-compilé, sans sudo)..."
+        if install_bat_prebuilt; then
+          info "bat installé dans $LOCAL_BIN"
+        else
+          warn "Échec installation bat — les alias retomberont sur cat"
+        fi
+      fi
+      ;;
+  esac
+fi
+
 # ── Téléchargement des fichiers zsh ───────────────────────────────────────────
 step "Téléchargement des fichiers zsh"
 
