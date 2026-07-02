@@ -317,3 +317,29 @@ zsh-restore() {
   rm -rf "$_tmp_dir"
   echo "Restauration terminée depuis: $_archive"
 }
+
+#------ SMART CAT / IMAGE VIEWER ------#
+# Détermination du binaire cat à utiliser (bat, batcat ou cat natif)
+if command -v bat >/dev/null 2>&1; then
+  _CAT_BIN="bat --paging=never"
+elif command -v batcat >/dev/null 2>&1; then
+  _CAT_BIN="batcat --paging=never"
+else
+  _CAT_BIN="command cat"
+fi
+
+# Fonction cat intelligente : ouvre feh sous X11 si c'est une image, sinon affiche le texte
+cat() {
+  # Si aucun argument ou si c'est un pipe/redirection, on applique le cat normal immédiatement
+  if [[ $# -eq 0 || ! -t 1 ]]; then
+    eval "$_CAT_BIN" "$@"
+    return
+  fi
+
+  # Vérification si le premier argument a une extension d'image valide ET si X11 est dispo
+  if [[ -n "$DISPLAY" ]] && command -v feh >/dev/null 2>&1 && [[ "$1" == *.(png|jpg|jpeg|gif|bmp|webp|PNG|JPG|JPEG|GIF|BMP|WEBP) ]]; then
+    feh "$1" &!
+  else
+    eval "$_CAT_BIN" "$@"
+  fi
+}
