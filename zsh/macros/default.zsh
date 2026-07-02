@@ -328,18 +328,26 @@ else
   _CAT_BIN="command cat"
 fi
 
-# Fonction cat intelligente : ouvre feh sous X11 si c'est une image, sinon affiche le texte
+# Fonction cat intelligente : inspecte le type MIME réel du fichier
 cat() {
-  # Si aucun argument ou si c'est un pipe/redirection, on applique le cat normal immédiatement
+  # Si aucun argument ou si c'est un pipe/redirection, cat normal immédiat
   if [[ $# -eq 0 || ! -t 1 ]]; then
     eval "$_CAT_BIN" "$@"
     return
   fi
 
-  # Vérification si le premier argument a une extension d'image valide ET si X11 est dispo
-  if [[ -n "$DISPLAY" ]] && command -v feh >/dev/null 2>&1 && [[ "$1" == *.(png|jpg|jpeg|gif|bmp|webp|PNG|JPG|JPEG|GIF|BMP|WEBP) ]]; then
-    feh "$1" &!
-  else
-    eval "$_CAT_BIN" "$@"
+  # On ne teste que si le premier argument est un fichier existant
+  if [[ -f "$1" && -n "$DISPLAY" ]] && command -v feh >/dev/null 2>&1; then
+    # Extrait le type MIME (ex: image/jpeg, text/plain)
+    local mime_type=$(file --brief --mime-type "$1" 2>/dev/null)
+
+    # Si le type MIME commence par "image/", on lance feh (sauf pour les fichiers SVG qui s'ouvrent mal dans feh)
+    if [[ "$mime_type" == image/* && "$mime_type" != "image/svg+xml" ]]; then
+      feh "$1" &!
+      return
+    fi
   fi
+
+  # Repli par défaut sur le cat textuel
+  eval "$_CAT_BIN" "$@"
 }
