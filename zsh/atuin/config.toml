@@ -22,7 +22,10 @@ search_mode = "fuzzy"
 # ── Interface ─────────────────────────────────────────────────────────────────
 style = "compact"
 inline_height = 20
+inline_height_shell_up_key_binding = 11
 show_preview = true
+show_help = false
+show_tabls = false
 # false : Entrée insère la commande dans le prompt au lieu de l'exécuter
 # directement — évite de relancer par erreur un rm ou un docker compose down
 enter_accept = false
