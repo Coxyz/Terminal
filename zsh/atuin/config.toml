@@ -23,7 +23,7 @@ search_mode = "fuzzy"
 style = "compact"
 inline_height = 20
 inline_height_shell_up_key_binding = 11
-show_preview = true
+show_preview = false
 show_help = false
 show_tabls = false
 # false : Entrée insère la commande dans le prompt au lieu de l'exécuter
@@ -55,6 +55,8 @@ history_filter = [
   "^\\s*zsh-(config|alias|macros|export|update)\\s*$",
   # Commandes sensibles : on ne veut pas de secret dans une base synchronisée
   "^\\s*(export\\s+\\w*(TOKEN|SECRET|PASSWORD|KEY)\\w*=|.*--password[= ])",
+  "^\\s*\\.+$",     
+  "^\\s*-$",
 ]
 
 [sync]
