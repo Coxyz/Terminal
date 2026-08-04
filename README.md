@@ -82,24 +82,41 @@ donc été retiré. `?` reste un caractère normal (mode IA d'atuin désactivé)
 | `Ctrl+R` | historique **global** (toutes les machines) |
 | `↑` | historique de **cette machine** uniquement |
 
-### Première machine
+### Connexion
 
-```sh
-atuin register -u <user> -e <email> -p '<password>'
-atuin import auto
-atuin sync
-atuin key            # ⚠️ à sauvegarder dans Bitwarden
+L'installeur la propose directement :
+
+```
+  Serveur : https://atuin.coxyz.fr
+    [1] J'ai déjà un compte  → login (demande la clé de chiffrement)
+    [2] Créer un compte      → register (1re machine uniquement)
+    [3] Plus tard
 ```
 
-Le chiffrement est de bout en bout : **sans cette clé, l'historique synchronisé
-est irrécupérable**, même avec un accès au serveur et à sa base.
+C'est **atuin** qui pose les questions et masque la saisie — aucun identifiant
+ne transite par le script, ni par les arguments de commande. L'étape est
+ignorée si tu es déjà connecté. Après connexion, l'installeur enchaîne sur
+`atuin import auto` puis `atuin sync`.
 
-### Machines suivantes
+Sur la **première machine** (option 2), la clé de chiffrement est affichée une
+fois : **sauvegarde-la immédiatement dans Bitwarden**. Le chiffrement est de
+bout en bout — sans elle, l'historique synchronisé est irrécupérable, même avec
+un accès au serveur et à sa base. Tu peux la réafficher avec `atuin key`.
+
+Sur les **machines suivantes** (option 1), cette même clé est demandée : sans
+elle, atuin créerait un second historique chiffré différemment.
+
+Pour faire la connexion à la main, ou plus tard :
 
 ```sh
-atuin login -u <user> -p '<password>' -k '<clé>'
-atuin import auto
-atuin sync
+atuin login       # ou : atuin register
+atuin import auto && atuin sync
+```
+
+Pour que l'installeur ne pose pas la question (machine partagée, CI) :
+
+```sh
+TERMINAL_SKIP_ATUIN_LOGIN=true bash -c "$(curl -fsSL …/install.sh)"
 ```
 
 ### Aliases
@@ -159,3 +176,4 @@ export TERMINAL_DISABLE_ATUIN=true
 | `TERMINAL_NO_AUTO_EXEC` | `0` | `1` désactive le `exec zsh` auto après install |
 | `TERMINAL_VERBOSE` | `false` | `true` affiche aussi les « déjà à jour » |
 | `TERMINAL_DISABLE_ATUIN` | `false` | `true` désactive l'intégration atuin |
+| `TERMINAL_SKIP_ATUIN_LOGIN` | `false` | `true` : l'installeur ne propose pas la connexion atuin |

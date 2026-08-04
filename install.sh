@@ -372,6 +372,78 @@ else
   info "EDITOR='vim' enregistré dans $EXPORT_ZSH"
 fi
 
+# ── atuin : connexion au serveur de sync ──────────────────────────────────────
+# Volontairement interactif : aucun identifiant n'est stocké dans le dépôt ni
+# passé en argument (les args de `atuin login -p …` finiraient dans la liste des
+# process et dans l'historique). C'est atuin lui-même qui pose les questions et
+# masque la saisie ; on se contente de lui brancher /dev/tty, indispensable car
+# stdin est occupé par le pipe de `curl | bash`.
+step "atuin — connexion au serveur"
+_atuin_just_logged_in=false
+
+if ! command -v atuin &>/dev/null; then
+  skip "atuin non installé — connexion ignorée"
+elif [ "${TERMINAL_SKIP_ATUIN_LOGIN:-false}" = "true" ]; then
+  skip "Connexion atuin ignorée (TERMINAL_SKIP_ATUIN_LOGIN=true)"
+elif atuin status >/dev/null 2>&1; then
+  skip "atuin déjà connecté"
+elif [ ! -e /dev/tty ]; then
+  warn "Pas de terminal interactif — connecte-toi ensuite avec : atuin login"
+else
+  _flush_step
+  _atuin_server="$(grep -E '^\s*sync_address' \
+    "${XDG_CONFIG_HOME:-$HOME/.config}/atuin/config.toml" 2>/dev/null \
+    | sed 's/.*"\(.*\)".*/\1/')"
+  echo -e "  Serveur : ${BLUE}${_atuin_server:-non configuré}${NC}"
+  echo "    [1] J'ai déjà un compte  → login (demande la clé de chiffrement)"
+  echo "    [2] Créer un compte      → register (1re machine uniquement)"
+  echo "    [3] Plus tard"
+  printf '  Choix [1/2/3] : '
+  read -r _atuin_choice < /dev/tty || _atuin_choice="3"
+
+  case "${_atuin_choice:-3}" in
+    1)
+      if atuin login < /dev/tty; then
+        info "Connecté au serveur atuin"
+        _atuin_just_logged_in=true
+      else
+        warn "Échec de la connexion — réessaie plus tard avec : atuin login"
+      fi
+      ;;
+    2)
+      if atuin register < /dev/tty; then
+        info "Compte atuin créé"
+        _atuin_just_logged_in=true
+        echo
+        warn "Clé de chiffrement — À SAUVEGARDER MAINTENANT (Bitwarden) :"
+        atuin key < /dev/tty || warn "Récupère-la avec : atuin key"
+        warn "Sans cette clé, l'historique synchronisé est IRRÉCUPÉRABLE,"
+        warn "même avec un accès au serveur et à sa base."
+        echo
+      else
+        warn "Échec de l'inscription — réessaie plus tard avec : atuin register"
+      fi
+      ;;
+    *)
+      skip "Connexion atuin reportée"
+      warn "Pour te connecter plus tard : atuin login   (ou atuin register)"
+      ;;
+  esac
+
+  if [ "$_atuin_just_logged_in" = "true" ]; then
+    if atuin import auto >/dev/null 2>&1; then
+      info "Historique shell existant importé dans atuin"
+    else
+      warn "Import de l'historique échoué — relance : atuin import auto"
+    fi
+    if atuin sync >/dev/null 2>&1; then
+      info "Synchronisation initiale effectuée"
+    else
+      warn "Sync initiale échouée — vérifie l'accès à ${_atuin_server:-ton serveur}"
+    fi
+  fi
+fi
+
 # ── Version & cache (pour l'auto-update) ──────────────────────────────────────
 # REMOTE_SHA a été résolu en début de script (et a servi à épingler RAW_BASE),
 # donc la version enregistrée correspond exactement aux fichiers téléchargés.
