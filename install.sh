@@ -231,6 +231,74 @@ else
   esac
 fi
 
+# ── atuin (historique shell synchronisé) ──────────────────────────────────────
+# Version épinglée : le protocole de sync évolue, client et serveur doivent
+# rester alignés (serveur : ghcr.io/atuinsh/atuin sur Boxyz).
+# ⚠️ Les tags d'IMAGE Docker n'ont pas de préfixe "v" (18.18.1), les tags Git
+#    des releases si (v18.18.1) — c'est ce dernier qui sert ici.
+ATUIN_VERSION="18.18.1"
+
+install_atuin_prebuilt() {
+  # Binaire pré-compilé dans ~/.local/bin (sans sudo).
+  local arch target url tmp
+  arch="$(uname -m)"
+  case "$PLATFORM" in
+    linux)
+      case "$arch" in
+        x86_64|amd64)  target="x86_64-unknown-linux-musl" ;;
+        aarch64|arm64) target="aarch64-unknown-linux-gnu" ;;
+        *) warn "Architecture non gérée pour atuin : $arch"; return 1 ;;
+      esac
+      ;;
+    macos)
+      case "$arch" in
+        x86_64|amd64)  target="x86_64-apple-darwin" ;;
+        arm64|aarch64) target="aarch64-apple-darwin" ;;
+        *) warn "Architecture non gérée pour atuin : $arch"; return 1 ;;
+      esac
+      ;;
+  esac
+  url="https://github.com/atuinsh/atuin/releases/download/v${ATUIN_VERSION}/atuin-${target}.tar.gz"
+  mkdir -p "$LOCAL_BIN"
+  tmp="$(mktemp -d)" || return 1
+  if curl -fsSL "$url" -o "$tmp/atuin.tar.gz" \
+      && tar -xzf "$tmp/atuin.tar.gz" -C "$tmp" --strip-components=1 \
+      && [ -f "$tmp/atuin" ]; then
+    mv "$tmp/atuin" "$LOCAL_BIN/atuin"
+    chmod +x "$LOCAL_BIN/atuin"
+    rm -rf "$tmp"
+    return 0
+  fi
+  rm -rf "$tmp"
+  return 1
+}
+
+step "atuin (historique synchronisé)"
+_atuin_installed=""
+if command -v atuin &>/dev/null; then
+  _atuin_installed="$(atuin --version 2>/dev/null | awk '{print $2}')" || true
+  _atuin_path="$(command -v atuin)"
+  case "$_atuin_path" in
+    "$LOCAL_BIN"/*) ;;
+    *) warn "atuin détecté hors de $LOCAL_BIN ($_atuin_path) — c'est lui qui sera utilisé si son chemin est prioritaire dans le PATH" ;;
+  esac
+fi
+
+if [ "$_atuin_installed" = "$ATUIN_VERSION" ]; then
+  skip "atuin $ATUIN_VERSION déjà installé"
+else
+  if [ -n "$_atuin_installed" ]; then
+    info "Mise à jour d'atuin ($_atuin_installed → $ATUIN_VERSION)..."
+  else
+    info "Installation d'atuin $ATUIN_VERSION (binaire pré-compilé, sans sudo)..."
+  fi
+  if install_atuin_prebuilt; then
+    info "atuin $ATUIN_VERSION installé dans $LOCAL_BIN"
+  else
+    warn "Échec installation atuin — Ctrl+R retombera sur fzf/l'historique zsh"
+  fi
+fi
+
 # ── Téléchargement des fichiers zsh ───────────────────────────────────────────
 step "Téléchargement des fichiers zsh"
 
@@ -269,6 +337,7 @@ download "$RAW_BASE/.zshrc"                      "$HOME/.zshrc"
 download "$RAW_BASE/aliases/default.zsh"         "$ZSH_CUSTOM/aliases/default.zsh"
 download "$RAW_BASE/macros/default.zsh"          "$ZSH_CUSTOM/macros/default.zsh"
 download "$RAW_BASE/fzf.zsh"                     "$ZSH_CUSTOM/fzf.zsh"
+download "$RAW_BASE/atuin.zsh"                   "$ZSH_CUSTOM/atuin.zsh"
 download "$RAW_BASE/update.zsh"                  "$ZSH_CUSTOM/update.zsh"
 download "$RAW_BASE/aussiegeek-custom.zsh-theme" "$ZSH_CUSTOM/themes/aussiegeek-custom.zsh-theme"
 
@@ -276,6 +345,12 @@ download "$RAW_BASE/aussiegeek-custom.zsh-theme" "$ZSH_CUSTOM/themes/aussiegeek-
 download_if_missing "$RAW_BASE/aliases/local.zsh" "$ZSH_CUSTOM/aliases/local.zsh" "aliases/local.zsh"
 download_if_missing "$RAW_BASE/macros/local.zsh"  "$ZSH_CUSTOM/macros/local.zsh"  "macros/local.zsh"
 download_if_missing "$RAW_BASE/export.zsh"        "$ZSH_CUSTOM/export.zsh"        "export.zsh"
+
+# Config atuin : fichier partagé (hors ZSH_CUSTOM, chemin imposé par atuin).
+# Les réglages propres à une machine passent par les variables ATUIN_* de
+# export.zsh, qui ont la priorité sur ce fichier.
+download "$RAW_BASE/atuin/config.toml" \
+  "${XDG_CONFIG_HOME:-$HOME/.config}/atuin/config.toml"
 
 # ── Éditeur par défaut ────────────────────────────────────────────────────────
 step "Configuration éditeur"

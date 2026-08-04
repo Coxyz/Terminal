@@ -4,6 +4,7 @@ ZSH_THEME="aussiegeek-custom"
 
 # ── Plugins ───────────────────────────────────────────────────────────────────
 # Note : zsh-syntax-highlighting doit toujours être en dernier
+# Note : pas de history-substring-search — atuin gère ^R et les flèches
 plugins=(
   git
   docker
@@ -15,7 +16,6 @@ plugins=(
   sudo
   z
   fzf
-  history-substring-search
   zsh-autosuggestions
   zsh-syntax-highlighting
 )
@@ -65,6 +65,11 @@ unset _zsh_file
 
 # ── Overrides locaux (exports propres à la machine) ───────────────────────────
 [[ -f "$ZSH_CUSTOM/export.zsh" ]] && source "$ZSH_CUSTOM/export.zsh"
+
+# ── Atuin (après export.zsh : permet TERMINAL_DISABLE_ATUIN / ATUIN_*) ────────
+# Doit rester APRÈS le chargement d'oh-my-zsh et de fzf.zsh pour que son
+# bindkey ^R écrase celui du plugin fzf.
+[[ -f "$ZSH_CUSTOM/atuin.zsh" ]] && source "$ZSH_CUSTOM/atuin.zsh"
 
 # ── Auto-update (après export.zsh pour respecter les réglages TERMINAL_*) ─────
 [[ -f "$ZSH_CUSTOM/update.zsh" ]] && source "$ZSH_CUSTOM/update.zsh"

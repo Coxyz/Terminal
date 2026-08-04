@@ -1,0 +1,58 @@
+# =============================================================================
+# config.toml — Client Atuin
+# Déployé par Coxyz/Terminal dans ~/.config/atuin/config.toml
+# ⚠️ Fichier PARTAGÉ : réécrit à chaque mise à jour.
+#    Pour une surcharge propre à une machine, utilise les variables ATUIN_*
+#    dans export.zsh (ex. export ATUIN_DB_PATH=...). Elles ont la priorité.
+# =============================================================================
+
+# ── Serveur de synchronisation ────────────────────────────────────────────────
+sync_address = "https://atuin.coxyz.fr"
+auto_sync = true
+sync_frequency = "5m"
+
+# ── Recherche ─────────────────────────────────────────────────────────────────
+# global : Ctrl-R cherche dans l'historique de TOUTES les machines
+filter_mode = "global"
+# La flèche haut, elle, reste limitée à la machine courante ("global" pour
+# qu'elle se comporte comme ^R)
+filter_mode_shell_up_key_binding = "host"
+search_mode = "fuzzy"
+
+# ── Interface ─────────────────────────────────────────────────────────────────
+style = "compact"
+inline_height = 20
+show_preview = true
+# false : Entrée insère la commande dans le prompt au lieu de l'exécuter
+# directement — évite de relancer par erreur un rm ou un docker compose down
+enter_accept = false
+
+# ── Divers ────────────────────────────────────────────────────────────────────
+# uk : dates au format jour/mois (`atuin search --after "01/09"`)
+dialect = "uk"
+# La version du client est épinglée par install.sh pour rester alignée avec le
+# serveur : pas de check de mise à jour à chaque shell.
+update_check = false
+
+# ── Commandes exclues de l'historique ─────────────────────────────────────────
+# Regex NON ancrées par défaut : sans ^ et $ elles matchent n'importe où dans la
+# commande (`^l$` ≠ `l`, qui filtrerait tout ce qui contient un « l »).
+# Toujours écrire `^…$`, et tester avant d'ajouter :
+#     atuin search "<commande>"    → doit encore la trouver si elle est utile
+history_filter = [
+  # Listing (eza/ls) — sans intérêt même avec arguments
+  "^\\s*(ls|l|ll|la|lt)(\\s.*)?$",
+  # Navigation et nettoyage d'écran
+  "^\\s*(cd|z)(\\s.*)?$",
+  "^\\s*(clear|cls|reload|exit|pwd)\\s*$",
+  # Aliases atuin eux-mêmes
+  "^\\s*(hs|hsync|hstat)(\\s.*)?$",
+  "^\\s*atuin\\s+(sync|status|search)(\\s.*)?$",
+  # Raccourcis d'édition de la config zsh
+  "^\\s*zsh-(config|alias|macros|export|update)\\s*$",
+  # Commandes sensibles : on ne veut pas de secret dans une base synchronisée
+  "^\\s*(export\\s+\\w*(TOKEN|SECRET|PASSWORD|KEY)\\w*=|.*--password[= ])",
+]
+
+[sync]
+records = true
