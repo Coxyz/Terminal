@@ -27,6 +27,7 @@ source "$ZSH/oh-my-zsh.sh"
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
+typeset -U path PATH
 
 # ── Langue & format horaire ───────────────────────────────────────────────────
 # LC_TIME=C.UTF-8 : format 24h neutre, disponible partout (évite l'AM/PM)
