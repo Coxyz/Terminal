@@ -28,7 +28,7 @@ show_help = false
 show_tabls = false
 # false : Entrée insère la commande dans le prompt au lieu de l'exécuter
 # directement — évite de relancer par erreur un rm ou un docker compose down
-enter_accept = false
+enter_accept = true
 
 # ── Divers ────────────────────────────────────────────────────────────────────
 # uk : dates au format jour/mois (`atuin search --after "01/09"`)
