@@ -50,12 +50,13 @@ history_filter = [
   "^\\s*(clear|cls|reload|exit|pwd|)\\s*$",
   # Aliases atuin eux-mêmes
   "^\\s*(hs|hsync|hstat)(\\s.*)?$",
-  "^\\s*atuin\\s+(sync|status|search)(\\s.*)?$",
+  "^\\s*atuin(\\s.*)?$",
   # Raccourcis d'édition de la config zsh
   "^\\s*zsh-(config|alias|macros|export|update)\\s*$",
   # Commandes sensibles : on ne veut pas de secret dans une base synchronisée
   "^\\s*(export\\s+\\w*(TOKEN|SECRET|PASSWORD|KEY)\\w*=|.*--password[= ])",
   "^\\s*ssh(\\s.*)?$",
+  "^\\s*rm(\\s.*)?$",
   "^\\s*\\.+$",     
   "^\\s*-$",
 ]
