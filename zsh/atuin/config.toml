@@ -56,7 +56,7 @@ history_filter = [
   # Commandes sensibles : on ne veut pas de secret dans une base synchronisée
   "^\\s*(export\\s+\\w*(TOKEN|SECRET|PASSWORD|KEY)\\w*=|.*--password[= ])",
   "^\\s*ssh(\\s.*)?$",
-  "^\\s*rm(\\s.*)?$",
+  "^\\s*(sudo\\s+)?rm(\\s.*)?$",
   "^\\s*\\.+$",     
   "^\\s*-$",
 ]
