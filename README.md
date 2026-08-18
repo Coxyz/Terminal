@@ -12,7 +12,8 @@ curl -fsSL https://raw.githubusercontent.com/Coxyz/Terminal/main/install.sh | ba
 
 L'installeur :
 - installe **Oh My Zsh**, les plugins (`zsh-autosuggestions`,
-  `zsh-syntax-highlighting`), **fzf**, **fd**, **eza**, **bat** et **atuin**
+  `zsh-syntax-highlighting`), **fzf**, **fd**, **eza**, **bat**, **glow**
+  (viewer Markdown), **lnav** (viewer de logs) et **atuin**
   (binaire pré-compilé dans `~/.local/bin` si pas de gestionnaire de paquets) ;
 - déploie les fichiers de config partagés ;
 - recharge le shell automatiquement (`exec zsh`) à la fin.
@@ -66,6 +67,26 @@ fois puis **jamais écrasés** par les mises à jour. Mets-y tes personnalisatio
 | `lt`     | arborescence (2 niveaux) |
 
 Repli automatique sur le vrai `ls` si `eza` n'est pas installé.
+
+## Affichage avec cat
+
+`cat` est une fonction qui choisit le bon viewer selon le fichier passé en
+premier argument :
+
+| Fichier | Viewer | Repli si absent |
+|---------|--------|-----------------|
+| `*.md`, `*.markdown` | `glow` (rendu Markdown) | `bat` / `cat` |
+| `*.log` | `lnav` (navigateur de logs) | `bat` / `cat` |
+| image (type MIME `image/*`, hors SVG) | `feh` (en tâche de fond, si `$DISPLAY`) | `bat` / `cat` |
+| le reste | `bat` / `batcat` (`--paging=never`) | `command cat` |
+
+Le routage est désactivé dès que la sortie n'est pas un terminal : dans un pipe
+ou une redirection (`cat notes.md | grep TODO`, `cat a.log > b.log`), c'est
+toujours le `cat` textuel qui s'applique, donc les scripts ne changent pas de
+comportement. Idem sans argument (`cat` seul lit l'entrée standard).
+
+Chaque viewer n'est utilisé que s'il est installé — sinon on retombe
+silencieusement sur `bat`, puis sur le `cat` du système.
 
 ## Historique synchronisé (atuin)
 

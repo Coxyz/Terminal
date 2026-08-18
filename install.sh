@@ -231,6 +231,123 @@ else
   esac
 fi
 
+# ── glow (viewer Markdown) ────────────────────────────────────────────────────
+install_glow_prebuilt() {
+  # Télécharge un binaire glow pré-compilé dans ~/.local/bin (sans sudo).
+  local arch target os url tmp version
+  arch="$(uname -m)"
+  case "$arch" in
+    x86_64|amd64)  target="x86_64" ;;
+    aarch64|arm64) target="arm64" ;;
+    *) warn "Architecture non gérée pour glow pré-compilé : $arch"; return 1 ;;
+  esac
+  case "$PLATFORM" in
+    linux) os="Linux" ;;
+    macos) os="Darwin" ;;
+  esac
+  version="$(curl -fsSL --max-time 8 "https://api.github.com/repos/charmbracelet/glow/releases/latest" 2>/dev/null \
+    | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')" || true
+  [ -z "$version" ] && { warn "Impossible de récupérer la version de glow"; return 1; }
+  url="https://github.com/charmbracelet/glow/releases/download/v${version}/glow_${version}_${os}_${target}.tar.gz"
+  mkdir -p "$LOCAL_BIN"
+  tmp="$(mktemp -d)" || return 1
+  if curl -fsSL "$url" -o "$tmp/glow.tar.gz" \
+      && tar -xzf "$tmp/glow.tar.gz" -C "$tmp" --strip-components=1 \
+      && [ -f "$tmp/glow" ]; then
+    mv "$tmp/glow" "$LOCAL_BIN/glow"
+    chmod +x "$LOCAL_BIN/glow"
+    rm -rf "$tmp"
+    return 0
+  fi
+  rm -rf "$tmp"
+  return 1
+}
+
+step "glow (viewer Markdown)"
+if command -v glow &>/dev/null; then
+  skip "glow déjà installé"
+else
+  case "$PLATFORM" in
+    macos)
+      if command -v brew &>/dev/null; then
+        brew install glow >/dev/null 2>&1 && info "glow installé (brew)" || warn "Échec installation glow via brew"
+      else
+        warn "Homebrew absent — installe glow manuellement : brew install glow"
+      fi
+      ;;
+    linux)
+      if _has_sudo && command -v apt-get &>/dev/null && apt-cache show glow &>/dev/null; then
+        sudo apt-get install -y glow >/dev/null 2>&1 && info "glow installé (apt)" || warn "Échec installation glow via apt"
+      else
+        info "Installation de glow (binaire pré-compilé, sans sudo)..."
+        if install_glow_prebuilt; then
+          info "glow installé dans $LOCAL_BIN"
+        else
+          warn "Échec installation glow — cat affichera les .md avec bat/cat"
+        fi
+      fi
+      ;;
+  esac
+fi
+
+# ── lnav (viewer de logs) ─────────────────────────────────────────────────────
+# Pas de build macOS x86_64 officiel : sur macOS on passe toujours par brew.
+install_lnav_prebuilt() {
+  # Télécharge un binaire lnav pré-compilé dans ~/.local/bin (sans sudo).
+  # Archive .zip (et non .tar.gz) : le binaire est dans lnav-<version>/lnav.
+  local arch target url tmp version
+  arch="$(uname -m)"
+  case "$arch" in
+    x86_64|amd64)  target="x86_64" ;;
+    aarch64|arm64) target="arm64" ;;
+    *) warn "Architecture non gérée pour lnav pré-compilé : $arch"; return 1 ;;
+  esac
+  command -v unzip &>/dev/null || { warn "unzip absent — impossible d'extraire lnav"; return 1; }
+  version="$(curl -fsSL --max-time 8 "https://api.github.com/repos/tstack/lnav/releases/latest" 2>/dev/null \
+    | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')" || true
+  [ -z "$version" ] && { warn "Impossible de récupérer la version de lnav"; return 1; }
+  url="https://github.com/tstack/lnav/releases/download/v${version}/lnav-${version}-linux-musl-${target}.zip"
+  mkdir -p "$LOCAL_BIN"
+  tmp="$(mktemp -d)" || return 1
+  if curl -fsSL "$url" -o "$tmp/lnav.zip" \
+      && unzip -qo "$tmp/lnav.zip" -d "$tmp" \
+      && [ -f "$tmp/lnav-${version}/lnav" ]; then
+    mv "$tmp/lnav-${version}/lnav" "$LOCAL_BIN/lnav"
+    chmod +x "$LOCAL_BIN/lnav"
+    rm -rf "$tmp"
+    return 0
+  fi
+  rm -rf "$tmp"
+  return 1
+}
+
+step "lnav (viewer de logs)"
+if command -v lnav &>/dev/null; then
+  skip "lnav déjà installé"
+else
+  case "$PLATFORM" in
+    macos)
+      if command -v brew &>/dev/null; then
+        brew install lnav >/dev/null 2>&1 && info "lnav installé (brew)" || warn "Échec installation lnav via brew"
+      else
+        warn "Homebrew absent — installe lnav manuellement : brew install lnav"
+      fi
+      ;;
+    linux)
+      if _has_sudo && command -v apt-get &>/dev/null && apt-cache show lnav &>/dev/null; then
+        sudo apt-get install -y lnav >/dev/null 2>&1 && info "lnav installé (apt)" || warn "Échec installation lnav via apt"
+      else
+        info "Installation de lnav (binaire pré-compilé, sans sudo)..."
+        if install_lnav_prebuilt; then
+          info "lnav installé dans $LOCAL_BIN"
+        else
+          warn "Échec installation lnav — cat affichera les .log avec bat/cat"
+        fi
+      fi
+      ;;
+  esac
+fi
+
 # ── atuin (historique shell synchronisé) ──────────────────────────────────────
 # Version épinglée : le protocole de sync évolue, client et serveur doivent
 # rester alignés (serveur : ghcr.io/atuinsh/atuin sur Boxyz).

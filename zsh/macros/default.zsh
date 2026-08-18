@@ -319,6 +319,8 @@ zsh-restore() {
 }
 
 #------ SMART CAT / IMAGE VIEWER ------#
+# `cat` route selon le fichier : images → feh, Markdown → glow, logs → lnav,
+# le reste → bat/batcat (ou le cat natif en dernier recours).
 # Détermination du binaire cat à utiliser (bat, batcat ou cat natif)
 if command -v bat >/dev/null 2>&1; then
   _CAT_BIN="bat --paging=never"
@@ -334,6 +336,24 @@ cat() {
   if [[ $# -eq 0 || ! -t 1 ]]; then
     eval "$_CAT_BIN" "$@"
     return
+  fi
+
+  # Routage par extension : Markdown → glow, logs → lnav (si l'outil est là)
+  if [[ -f "$1" ]]; then
+    case "${1:l}" in
+      *.md|*.markdown)
+        if command -v glow >/dev/null 2>&1; then
+          glow "$@"
+          return
+        fi
+        ;;
+      *.log)
+        if command -v lnav >/dev/null 2>&1; then
+          lnav "$@"
+          return
+        fi
+        ;;
+    esac
   fi
 
   # On ne teste que si le premier argument est un fichier existant
