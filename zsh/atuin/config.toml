@@ -57,6 +57,7 @@ history_filter = [
   "^\\s*(export\\s+\\w*(TOKEN|SECRET|PASSWORD|KEY)\\w*=|.*--password[= ])",
   "^\\s*ssh(\\s.*)?$",
   "^\\s*(sudo\\s+)?rm(\\s.*)?$",
+  "^\\s*(sudo\\s+)?reboot(\\s.*)?$",
   "^\\s*\\.+$",     
   "^\\s*-$",
 ]
